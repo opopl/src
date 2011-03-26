@@ -1,0 +1,30 @@
+PROG =	
+
+SRCS =	convertf90.f90
+
+OBJS =	convertf90.o
+
+LIBS =	
+
+CC = cc
+CFLAGS = -O
+FC = $(FC90)
+FFLAGS = -O
+F90 = $(FC90)
+F90FLAGS = -O
+LDFLAGS = -s
+
+all: $(PROG)
+
+$(PROG): $(OBJS)
+	$(F90) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+clean:
+	rm -f $(PROG) $(OBJS) *.mod
+
+.SUFFIXES: $(SUFFIXES) .f90
+
+.f90.o:
+	$(F90) $(F90FLAGS) -c $<
+
+convertf90.o: convertf90.o
