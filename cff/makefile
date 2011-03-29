@@ -1,8 +1,8 @@
-PROG =	
+PROG =	cff
 
-SRCS =	convertf90.f90
+SRCS =	cff.f90
 
-OBJS =	convertf90.o
+OBJS =	cff.o
 
 LIBS =	
 
@@ -27,4 +27,3 @@ clean:
 .f90.o:
 	$(F90) $(F90FLAGS) -c $<
 
-convertf90.o: convertf90.o
