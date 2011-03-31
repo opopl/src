@@ -1618,14 +1618,18 @@
 
    SELECTCASE(TOPIC)
         CASE("")
+write(*,10) "===================================================================="
+write(*,10) ""
 write(*,10) "Copyright CERN, Geneva 1991, 1997 - Copyright and any other "
 write(*,10) "appropriate legal protection of these computer programs "
 write(*,10) "and associated documentation reserved in all countries "
 write(*,10) "of the world. "
 write(*,10) ""
+write(*,10) "===================================================================="
 write(*,10) "Author: Michael Metcalf  (MichaelMetcalf@compuserve.com) "
+write(*,10) "===================================================================="
 write(*,10) ""
-Write(*,10) "   A program to convert FORTRAN 77 source form to Fortran 90 source  "
+write(*,10) "   A program to convert FORTRAN 77 source form to Fortran 90 source  "
 write(*,10) "form. It also formats the code by indenting the bodies of DO-loops  "
 write(*,10) "and IF-blocks by ISHIFT columns. Statement keywords are             "
 write(*,10) "followed if necessary by a blank, and blanks within tokens are      "
@@ -1642,9 +1646,35 @@ write(*,10) "treated similarly. The length specification *4 is removed for all  
 write(*,10) "data types except CHARACTER, as is *8 for COMPLEX. This             "
 write(*,10) "treatment of non-standard type declarations includes any            "
 write(*,10) "non-standard IMPLICIT statements.                                   "
+write(*,10) ""
 write(*,10) "Optionally, interface blocks only may be produced; this requires  "
 write(*,10) "blanks processing to be requested. The interface blocks are         "
 write(*,10) "compatible with both the old and new source forms.                  "
+write(*,10) ""
+write(*,10) "===================================================================="
+write(*,10) ""
+write(*,10) "Command-line options: "
+write(*,10) " "
+write(*,10) "-f      NAME    (STRING)  Fortran 77 file to be converted (without .f extension!)  "
+write(*,10) "-id     ISHIFT  (INTEGER) Indentation depth"
+write(*,10) "-md     MXDPTH  (INTEGER) Maximal indent level" 
+write(*,10) "-bl     BLANKS  (LOGICAL) Blank treatment "
+write(*,10) "-ib     INTFBL  (LOGICAL) For interface blocks only"
+write(*,10) " "
+write(*,10) "LOGICAL variable values: T (True) or F (False)"
+write(*,10) " "
+write(*,10) "Default values: "
+write(*,10) " "
+write(*,10) "ISHIFT = 3 "
+write(*,10) "MXDPTH = 10 "
+write(*,10) "BLANKS = .TRUE. "
+write(*,10) "INTBFL = .FALSE. "
+write(*,10) " "
+write(*,10) "Usage: "
+write(*,10) " "
+write(*,10) "cff -f NAME "
+write(*,10) " "
+write(*,10) "===================================================================="
         CASE DEFAULT
    ENDSELECT
 10 format (A)
@@ -1663,13 +1693,13 @@ write(*,10) "compatible with both the old and new source forms.                 
       INTEGER NARGS,I
       CHARACTER(LEN=80) BFF,VAR,IFILE
 !
-!   Prompt for interactive use
-      WRITE (*,'(" Type name of file, shift, max. indent level, T or F &
-        &for blank treatment,",/ " T or F for interface blocks only.")')
-      WRITE (*,'(" For simple use type only the name of the file ",    &
-            &"followed by a slash (/) and RETURN.",/                   &
-            &" Note that the name should be given WITHOUT extension!")')
-!
+!!   Prompt for interactive use
+      !WRITE (*,'(" Type name of file, shift, max. indent level, T or F &
+        !&for blank treatment,",/ " T or F for interface blocks only.")')
+      !WRITE (*,'(" For simple use type only the name of the file ",    &
+            !&"followed by a slash (/) and RETURN.",/                   &
+            !&" Note that the name should be given WITHOUT extension!")')
+!!
 !   Does standard input unit contain an input record
       NIN = 11
       NOUT = 12
@@ -1688,21 +1718,30 @@ write(*,10) "compatible with both the old and new source forms.                 
                SELECTCASE(BFF)
                       CASE('-f')
                               READ(VAR,*) NAME
-                              WRITE(*,*) 'INPUT FILE NAME:',NAME
+                      CASE('-id')
+                              READ(VAR,*) ISHIFT
+                      CASE('-md')
+                              READ(VAR,*) MXDPTH
+                      CASE('-bl')
+                              READ(VAR,*) BLANKS
+                      CASE('-ib')
+                              READ(VAR,*) INTBFL
                       CASE DEFAULT
                ENDSELECT
                I=I+1
         ENDDO
       ELSE
         CALL PRINT_HELP("")
+        STOP
       ENDIF
+        !WRITE(*,*) 'INPUT FILE NAME:',NAME
        
       !READ (* , * , END = 1 , ERR = 1) NAME, ISHIFT , MXDPTH ,         &
       !BLANKS, INTBFL
 
       ! }}}
 !
-!   If record present, check input values are reasonable
+!   If recoRd present, check input values are reasonable
       ISHIFT = MIN(MAX(ISHIFT , 0) , 10)
       MXDPTH = MIN(MAX(MXDPTH , 0) , 36/MAX(ISHIFT,1))
       IF (INTBFL.AND..NOT.BLANKS) WRITE (*, '('' Interface block proces&
@@ -1724,7 +1763,7 @@ write(*,10) "compatible with both the old and new source forms.                 
      &           " Maximum indenting level is     ",I3)')              &
               ISHIFT , MXDPTH
       IF (BLANKS) WRITE (*,                                            &
-      '(" Significant blank proccessing requested")')
+      '(" Significant blank processing requested")')
       IF (INTBFL) WRITE (*,                                            &
       '('' Only interface blocks will be produced'')')
       IF (INTBFL) WRITE (NOUT, '(6X, ''INTERFACE'')')
@@ -1760,6 +1799,7 @@ write(*,10) "compatible with both the old and new source forms.                 
     RETURN
     END SUBROUTINE TERMINATE
    END MODULE ALL_PROCEDURES
+
    PROGRAM CONVERT
    USE ALL_PROCEDURES
    implicit none
