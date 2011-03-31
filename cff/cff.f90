@@ -98,7 +98,7 @@
       implicit none
       public
       INTEGER, PARAMETER :: NEST = 32 , LEN = 2640 , KKLIM = 200,      &
-      KLEN = 266*KKLIM
+      KLEN = 72*KKLIM
 !
       INTEGER :: KNTDO , KNTIF , KNTCOM , LABEL , LENST , LABLNO, NOARG
       INTEGER, DIMENSION(NEST) :: LABLDO
@@ -302,8 +302,8 @@
 !
 !   Blank out end of statement
       IF (LENOLD > LENST) STAMNT(LENST+1:LENOLD) = ' '
-      IF (LENST < LEN .AND. MOD(LENST, 260) /= 0)                       &
-          STAMNT(LENST+1: LENST+260-MOD(LENST, 260)) = ' '
+      IF (LENST < LEN .AND. MOD(LENST, 66) /= 0)                       &
+          STAMNT(LENST+1: LENST+66-MOD(LENST, 66)) = ' '
 !
 99 RETURN
    END SUBROUTINE BLANK
@@ -891,9 +891,9 @@
 !
       CHARACTER(LEN=1) :: CONTIN
       CHARACTER(LEN=3), PARAMETER :: FIN='END', FINLC='end'
-      CHARACTER(LEN=260) :: FIELD
-      CHARACTER(LEN=266) :: LINE
-      CHARACTER(LEN=266), PARAMETER :: BLANKV=' '
+      CHARACTER(LEN=66) :: FIELD
+      CHARACTER(LEN=72) :: LINE
+      CHARACTER(LEN=72), PARAMETER :: BLANKV=' '
 !
       LOGICAL :: NEWDO , NEWIF , FORM ,  ELSEBL , ASSIGN
 !
@@ -938,21 +938,21 @@
          IF (LINE(:1) == 'C' .OR. LINE(:1) == '*'                      &
          .OR. LINE(:1) == 'c') LINE(:1) = '!'
          IF (KNTCOM == KKLIM) THEN
-            WRITE (NOUT , '(A266)') (CBUF(266*L5-265:266*L5) , L5 = 1 ,    &
+            WRITE (NOUT , '(A72)') (CBUF(72*L5-71:72*L5) , L5 = 1 ,    &
             KNTCOM) , LINE
             KNTCOM = 0
          ELSE IF (SYNERR .OR. .NOT.STAT) THEN
-            WRITE (NOUT , '(A266)') LINE
+            WRITE (NOUT , '(A72)') LINE
          ELSE
             KNTCOM = KNTCOM+1
-            CBUF(266*KNTCOM-265:266*KNTCOM) = LINE
+            CBUF(72*KNTCOM-71:72*KNTCOM) = LINE
          END IF
          GO TO 2
       END IF
 !
 !   Some form of embedded comment?
       NAPO = 0
-      DO L22 = 2, 266
+      DO L22 = 2, 72
          IF (LINE(L22:L22)  ==  '''') NAPO = 1 - NAPO
          IF (L22 == 6) CYCLE
          IF (LINE(L22:L22)  /=  '!') CYCLE
@@ -960,19 +960,19 @@
          IF (.NOT. INTFL) THEN
             IF (KNTCOM  <  KKLIM) THEN
                KNTCOM = KNTCOM +1
-               CBUF(266*KNTCOM-265:266*KNTCOM) =                          &
-                                BLANKV(:L22-1)//LINE(L22:266)
+               CBUF(72*KNTCOM-71:72*KNTCOM) =                          &
+                                BLANKV(:L22-1)//LINE(L22:72)
             ELSE
-               WRITE (NOUT, '(A)') BLANKV(:L22-1)//LINE(L22:266)
+               WRITE (NOUT, '(A)') BLANKV(:L22-1)//LINE(L22:72)
             END IF
          END IF
-         LINE(L22:266) = ' '
+         LINE(L22:72) = ' '
          IF (LINE  ==  ' ') GO TO 2
          EXIT
       END DO
 !
 !   Line is some form of statement; re-read.
-      READ (LINE , '(BN , I5 , A1 , A260)') LAB , CONTIN , FIELD
+      READ (LINE , '(BN , I5 , A1 , A66)') LAB , CONTIN , FIELD
       STAT = .TRUE.
 !
 !   Check on syntax and copy to statement buffer
@@ -981,16 +981,16 @@
          CONTIN = '&'
          IF (SYNERR) THEN
             GO TO 6
-         ELSE IF (LENST == 0 .OR. LENST+260 > LEN .OR. LAB /= 0) THEN
+         ELSE IF (LENST == 0 .OR. LENST+66 > LEN .OR. LAB /= 0) THEN
             SYNERR = .TRUE.
             IF (LENST > 0) THEN
                IF (LABEL /= 0) THEN
-                  WRITE (NOUT , '(I5, 1X, A260:"&"/(5X, "&", A260:       &
+                  WRITE (NOUT , '(I5, 1X, A66:"&"/(5X, "&", A66:       &
      &            "&"))') LABEL ,                                      &
-                  (STAMNT(260*L9-65:260*L9) , L9 = 1 , (LENST+65)/260)
+                  (STAMNT(66*L9-65:66*L9) , L9 = 1 , (LENST+65)/66)
                ELSE
-                  WRITE (NOUT , '(6X, A260:"&"/(5X, "&", A260:"&"        &
-     &            ))') (STAMNT(260*L9-65:260*L9) , L9 = 1 , (LENST+65)/260)
+                  WRITE (NOUT , '(6X, A66:"&"/(5X, "&", A66:"&"        &
+     &            ))') (STAMNT(66*L9-65:66*L9) , L9 = 1 , (LENST+65)/66)
                END IF
             END IF
             IF (LAB /= 0) THEN
@@ -1001,14 +1001,14 @@
             GO TO 1
          ELSE
             KNTCON = KNTCON+1
-            STAMNT(LENST+1:LENST+260) = FIELD
-            LENST = LENST+260
+            STAMNT(LENST+1:LENST+66) = FIELD
+            LENST = LENST+66
             GO TO 2
          END IF
       ELSE IF (KNTCON == 0) THEN
          IF (LENST /= 0) GO TO 4
-         STAMNT(1:260) = FIELD
-         LENST = 260
+         STAMNT(1:66) = FIELD
+         LENST = 66
          LABEL = LAB
          IF (SYNERR) GO TO 4
          GO TO 2
@@ -1046,8 +1046,8 @@
                SYNERR = .FALSE.
                KNTCON = 0
                LENST = 0
-               IF (KNTCOM /= 0) WRITE (NOUT , '(A266)') (CBUF(266*L5-265: &
-               266*L5) , L5 = 1 , KNTCOM)
+               IF (KNTCOM /= 0) WRITE (NOUT , '(A72)') (CBUF(72*L5-71: &
+               72*L5) , L5 = 1 , KNTCOM)
                KNTCOM = 0
                NAME = ' '
                NOARG = 0
@@ -1166,7 +1166,7 @@
  1000 FORMAT(I5 , A1 , A)
  1001 FORMAT(TR6 , A3 ,TR1, A)
  1002 FORMAT(I5 , TR1 , A3 ,TR1, A)
- 1006 FORMAT(TR5 , A1 , A260)
+ 1006 FORMAT(TR5 , A1 , A66)
 !
    RETURN
    END SUBROUTINE PROGRAM_UNITS
@@ -1179,7 +1179,7 @@
       USE STRUCTURE
    implicit none
 !
-      INTEGER, PARAMETER :: LLIMIT = LEN-(LEN/260-1)*6
+      INTEGER, PARAMETER :: LLIMIT = LEN-(LEN/66-1)*6
       CHARACTER(LEN=LEN) :: OUT
       CHARACTER(LEN = 1) :: AMP
 !
@@ -1210,7 +1210,7 @@
       IF (ELSEBL) IDEPTH = IDEPTH-1
       IPNT = 1
       JPNT = 1
-    1 IF (MOD(IPNT , 260) == 1) THEN
+    1 IF (MOD(IPNT , 66) == 1) THEN
          IF (IPNT+65 > LEN) GO TO 9
          OUT(IPNT:IPNT+65) = ' '
          IPNT = IPNT+IDEPTH*ISHIFT
@@ -1248,8 +1248,8 @@
 !   underscores and dollars are so treated to handle common extensions,
 !   and the ** and // operators and real literal constants are treated.
     5 KADD = 0
-      IF (L3-L2  <=  260-MOD(IPNT , 260)) GO TO  8
-      DO L4 = 260+L2-MOD(IPNT , 260) , L2 , -1
+      IF (L3-L2  <=  66-MOD(IPNT , 66)) GO TO  8
+      DO L4 = 66+L2-MOD(IPNT , 66) , L2 , -1
          IF (STAMNT(L4:L4) == ' ') GO TO 7
          IF (LGE(STAMNT(L4:L4) , 'A') .AND. LLE(STAMNT(L4:L4) , 'Z'))  &
          CYCLE
@@ -1282,7 +1282,7 @@
 !
 !   No break character found
       IF (BLNKFL) GO TO 9
-      L4 = 260-MOD(IPNT , 260)+L2
+      L4 = 66-MOD(IPNT , 66)+L2
 !
 !   Cut here
     7 L3 = L4
@@ -1294,9 +1294,9 @@
 !
 !   Set pointers for next section of statement
       IPNT = LOUT+1
-      IF (KADD == 1 .AND. MOD(IPNT , 260) /= 1 .OR. MOD(IPNT , 260)      &
-       >= 60) IPNT = ((IPNT+65)/260)*260+1
-      IF (MOD(IPNT , 260) == 0) IPNT = IPNT+1
+      IF (KADD == 1 .AND. MOD(IPNT , 66) /= 1 .OR. MOD(IPNT , 66)      &
+       >= 60) IPNT = ((IPNT+65)/66)*66+1
+      IF (MOD(IPNT , 66) == 0) IPNT = IPNT+1
       JPNT = L3+1
       IF (KADD == 0) JPNT = JPNT+1
       GO TO   1
@@ -1304,54 +1304,54 @@
 !   Copied statement (if adding 6 cols. to initial line would cause
 !   total length to exceed 2640, must start it in col.1)
     9 LENST = LEN_TRIM(STAMNT(:LENST))
-      IF (LENST > 260) THEN
+      IF (LENST > 66) THEN
          AMP = '&'
       ELSE
          AMP = ' '
       END IF
       IF (LABEL /= 0) THEN
-         WRITE (NOUT , 1003) LABEL , STAMNT(:MIN(LENST, 260)), AMP
+         WRITE (NOUT , 1003) LABEL , STAMNT(:MIN(LENST, 66)), AMP
       ELSE
          IF (LENST < LEN-6) THEN
-            WRITE (NOUT , 1004) STAMNT(:MIN(LENST,260)), AMP
+            WRITE (NOUT , 1004) STAMNT(:MIN(LENST,66)), AMP
          ELSE
-            WRITE (NOUT , '(A,A1)') STAMNT(:MIN(LENST, 260)), AMP
+            WRITE (NOUT , '(A,A1)') STAMNT(:MIN(LENST, 66)), AMP
          END IF
       END IF
-      IF (LENST > 260) WRITE (NOUT , 1005)                              &
-     &('&', STAMNT(260*L6-65:260*L6) , L6 = 2 , (LENST+65)/260)
+      IF (LENST > 66) WRITE (NOUT , 1005)                              &
+     &('&', STAMNT(66*L6-65:66*L6) , L6 = 2 , (LENST+65)/66)
       GO TO  11
 !
 !   Write OUT to output unit
    10 LOUT = LEN_TRIM(OUT(:LOUT))
-      IF (LOUT > 260) THEN
+      IF (LOUT > 66) THEN
          AMP = '&'
       ELSE
          AMP =' '
       END IF
       IF (LABEL /= 0) THEN
-         WRITE (NOUT , 1003) LABEL , OUT(:MIN(LOUT, 260)), AMP
+         WRITE (NOUT , 1003) LABEL , OUT(:MIN(LOUT, 66)), AMP
       ELSE
-         WRITE (NOUT , 1004) OUT(:MIN(LOUT, 260)), AMP
+         WRITE (NOUT , 1004) OUT(:MIN(LOUT, 66)), AMP
       END IF
 !
 !   An & is required in col. 6 if statement has more than 2412
 !   characters, otherwise total length including cols. 1-6 will
 !   exceed 2640. Also if making interface blocks, in order to be
 !   compatible with both old and new source forms.
-      IF (LOUT > 260) THEN
+      IF (LOUT > 66) THEN
          IF (LOUT > LLIMIT .OR. INTFL) THEN
             AMP = '&'
          ELSE
             AMP = ' '
          END IF
-         WRITE (NOUT , 1005) (AMP , OUT(260*L5-65:260*L5) , L5 = 2 , (   &
-         LOUT+65)/260)
+         WRITE (NOUT , 1005) (AMP , OUT(66*L5-65:66*L5) , L5 = 2 , (   &
+         LOUT+65)/66)
       END IF
 !
 !   Write any comments following statement
    11 IF (KNTCOM /= 0) THEN
-         WRITE (NOUT ,'(A266)') (CBUF(266*L5-265:266*L5) , L5 = 1 , KNTCOM)
+         WRITE (NOUT ,'(A72)') (CBUF(72*L5-71:72*L5) , L5 = 1 , KNTCOM)
          KNTCOM = 0
       END IF
 !
