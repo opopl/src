@@ -1,4 +1,5 @@
 !     Copyright CERN, Geneva 1991, 1997 - Copyright and any other
+! {{{
 !     appropriate legal protection of these computer programs
 !     and associated documentation reserved in all countries
 !     of the world.
@@ -35,6 +36,7 @@
 !  blanks processing to be requested. The interface blocks are         *
 !  compatible with both the old and new source forms.                  *
 !                                                                      *
+! }}}
 !    Usage: the program reads one data record in free format from the  *
 !          default input unit. This contains:                          *
 !                                                                      *
@@ -1609,13 +1611,57 @@
       END IF
 99 RETURN
    END SUBROUTINE SPECIAL
+
+   SUBROUTINE PRINT_HELP(TOPIC)
+
+   CHARACTER(LEN=*) :: TOPIC
+
+   SELECTCASE(TOPIC)
+        CASE("")
+write(*,10) "Copyright CERN, Geneva 1991, 1997 - Copyright and any other "
+write(*,10) "appropriate legal protection of these computer programs "
+write(*,10) "and associated documentation reserved in all countries "
+write(*,10) "of the world. "
+write(*,10) ""
+write(*,10) "Author: Michael Metcalf  (MichaelMetcalf@compuserve.com) "
+write(*,10) ""
+Write(*,10) "   A program to convert FORTRAN 77 source form to Fortran 90 source  "
+write(*,10) "form. It also formats the code by indenting the bodies of DO-loops  "
+write(*,10) "and IF-blocks by ISHIFT columns. Statement keywords are             "
+write(*,10) "followed if necessary by a blank, and blanks within tokens are      "
+write(*,10) "are suppressed; this handling of blanks is optional.                "
+write(*,10) "If a CONTINUE statement terminates a single DO loop, it is        "
+write(*,10) "replaced by END DO.                                                 "
+write(*,10) "Procedure END statements have the procedure name added, if        "
+write(*,10) "blanks are handled.                                                 "
+write(*,10) "Statements like INTEGER*2 are converted to INTEGER(2), if blanks  "
+write(*,10) "are handled. Depending on the target processor, a further global    "
+write(*,10) "edit might be required (e.g. where 2 bytes correspond to KIND=1).   "
+write(*,10) "Typed functions and assumed-length character specifications are     "
+write(*,10) "treated similarly. The length specification *4 is removed for all   "
+write(*,10) "data types except CHARACTER, as is *8 for COMPLEX. This             "
+write(*,10) "treatment of non-standard type declarations includes any            "
+write(*,10) "non-standard IMPLICIT statements.                                   "
+write(*,10) "Optionally, interface blocks only may be produced; this requires  "
+write(*,10) "blanks processing to be requested. The interface blocks are         "
+write(*,10) "compatible with both the old and new source forms.                  "
+        CASE DEFAULT
+   ENDSELECT
+10 format (A)
+
+   END SUBROUTINE PRINT_HELP
+
    SUBROUTINE START( )
 !
 !   To prepare for PROGRAM_UNITS
 !
       USE DATA
-   implicit none
+
+      implicit none
+
       CHARACTER(LEN=16) :: NAME
+      INTEGER NARGS,I
+      CHARACTER(LEN=80) BFF,VAR,IFILE
 !
 !   Prompt for interactive use
       WRITE (*,'(" Type name of file, shift, max. indent level, T or F &
@@ -1631,8 +1677,30 @@
       MXDPTH = 0
       BLANKS = .FALSE.
       INTBFL = .FALSE.
-      READ (* , * , END = 1 , ERR = 1) NAME, ISHIFT , MXDPTH ,         &
-      BLANKS, INTBFL
+      !command-line reading block {{{
+      NARGS=IARGC()
+      I=0    
+      IF (NARGS.GT.0) THEN
+        DO WHILE(I.LT.NARGS)
+               I=I+1 
+               CALL GETARG(I,BFF)
+               CALL GETARG(I+1,VAR)
+               SELECTCASE(BFF)
+                      CASE('-f')
+                              READ(VAR,*) NAME
+                              WRITE(*,*) 'INPUT FILE NAME:',NAME
+                      CASE DEFAULT
+               ENDSELECT
+               I=I+1
+        ENDDO
+      ELSE
+        CALL PRINT_HELP("")
+      ENDIF
+       
+      !READ (* , * , END = 1 , ERR = 1) NAME, ISHIFT , MXDPTH ,         &
+      !BLANKS, INTBFL
+
+      ! }}}
 !
 !   If record present, check input values are reasonable
       ISHIFT = MIN(MAX(ISHIFT , 0) , 10)
