@@ -32,6 +32,7 @@ MODULE STRUCTURE
       CHARACTER(LEN=42)  :: NAME
 !
    END MODULE STRUCTURE
+
    MODULE DATA
    implicit none
    public
@@ -40,6 +41,7 @@ MODULE STRUCTURE
       LOGICAL, SAVE :: BLANKS, INTBFL
 !
    END MODULE DATA
+
    MODULE STATISTICS
    implicit none
    public
