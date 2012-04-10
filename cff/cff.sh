@@ -4,7 +4,7 @@ let flen=266
 let flen1=$(($flen-1))
 let flen6=$(($flen-6))
 
-cat << EOF
+cat << _EOF
 MODULE STRUCTURE
 !
 !***********************************************************************
@@ -1537,11 +1537,17 @@ MODULE STRUCTURE
    END SUBROUTINE SPECIAL
 
    SUBROUTINE PRINT_HELP(TOPIC)
+   ! {{{
 
    CHARACTER(LEN=*) :: TOPIC
 
    SELECTCASE(TOPIC)
-        CASE("")
+        CASE("-h") !{{{
+write(*,10) "===================================================================="
+write(*,10) ""
+write(*,10) "cff -u  - Usage"
+write(*,10) "cff -h  - This help message"
+write(*,10) ""
 write(*,10) "===================================================================="
 write(*,10) ""
 write(*,10) "Copyright CERN, Geneva 1991, 1997 - Copyright and any other "
@@ -1576,6 +1582,9 @@ write(*,10) "blanks processing to be requested. The interface blocks are        
 write(*,10) "compatible with both the old and new source forms.                  "
 write(*,10) ""
 write(*,10) "===================================================================="
+! }}}
+        CASE("-u") ! {{{
+write(*,10) "===================================================================="
 write(*,10) ""
 write(*,10) "Command-line options: "
 write(*,10) " "
@@ -1599,10 +1608,11 @@ write(*,10) " "
 write(*,10) "cff -f NAME "
 write(*,10) " "
 write(*,10) "===================================================================="
+! }}}
         CASE DEFAULT
    ENDSELECT
 10 format (A)
-
+! }}}
    END SUBROUTINE PRINT_HELP
 
    SUBROUTINE START( )
@@ -1650,12 +1660,14 @@ write(*,10) "===================================================================
                               READ(VAR,*) BLANKS
                       CASE('-ib')
                               READ(VAR,*) INTBFL
-                      CASE DEFAULT
+					  case("-h","-u")
+        				CALL PRINT_HELP(BFF)
+						STOP
                ENDSELECT
                I=I+1
         ENDDO
       ELSE
-        CALL PRINT_HELP("")
+       	CALL PRINT_HELP("-h")
         STOP
       ENDIF
         !WRITE(*,*) 'INPUT FILE NAME:',NAME
@@ -1738,4 +1750,4 @@ write(*,10) "===================================================================
       CALL TERMINATE( )
       STOP
    END PROGRAM CONVERT
-EOF
+_EOF

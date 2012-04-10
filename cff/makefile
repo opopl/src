@@ -14,7 +14,10 @@ F90 = $(FC90)
 F90FLAGS = -O
 LDFLAGS = -s
 
-all: $(PROG)
+all: cff.f90 $(PROG)
+
+cff.f90: cff.sh
+	$^ > $@
 
 $(PROG): $(OBJS)
 	$(F90) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
